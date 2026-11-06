@@ -1,4 +1,4 @@
-// Command login obtains a short-lived token using Authorization Code + PKCE.
+// Command login obtains a demo access token using Authorization Code + PKCE.
 // Credentials are entered only at Keycloak, never into this command.
 package main
 

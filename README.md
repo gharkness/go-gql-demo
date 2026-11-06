@@ -38,7 +38,7 @@ The seeded first book is `Computing Notes`, written by Ada Lovelace, with Grace 
 TOKEN=$(go run ./cmd/login)
 ```
 
-The command prints a login URL to **stderr**. Open it in your browser and sign in at Keycloak as `ada` / `ada`. The callback validates state, issuer, the ID token, and nonce; the command then returns only the access token to stdout, which the shell captures in `TOKEN`. The token is short-lived (five minutes); run the command again when it expires. This command intentionally does not persist refresh tokens.
+The command prints a login URL to **stderr**. Open it in your browser and sign in at Keycloak as `ada` / `ada`. The callback validates state, issuer, the ID token, and nonce; the command then returns only the access token to stdout, which the shell captures in `TOKEN`. Demo access tokens last up to 12 hours; run the command again when yours expires. Changing the setting does not extend tokens already issued. This command intentionally does not persist refresh tokens.
 
 ```sh
 curl -s http://localhost:8080/graphql \
@@ -153,8 +153,8 @@ MySQL init scripts and Keycloak realm imports run only against fresh volumes. Ed
 
 ## OAuth choices and local-only settings
 
-Keycloak enables Authorization Code with **S256 PKCE**, exact redirect/logout URIs, a fixed API audience, five-minute access tokens, refresh-token rotation, brute-force protection, and disabled username editing/self-registration. Password, implicit, and service-account grants are disabled for the public client. User/profile linkage uses stable subject IDs. Tokens never go in query URLs or browser persistent storage. The CLI binds its callback to loopback, has a three-minute timeout, and validates state, issuer, nonce, and the ID token before releasing the access token.
+Keycloak enables Authorization Code with **S256 PKCE**, exact redirect/logout URIs, a fixed API audience, 12-hour demo access tokens (with a 12-hour SSO idle timeout and 24-hour session maximum), refresh-token rotation, brute-force protection, and disabled username editing/self-registration. Password, implicit, and service-account grants are disabled for the public client. User/profile linkage uses stable subject IDs. Tokens never go in query URLs or browser persistent storage. The CLI binds its callback to loopback, has a three-minute timeout, and validates state, issuer, nonce, and the ID token before releasing the access token.
 
-The localhost example intentionally uses Keycloak `start-dev`, HTTP, a development database, known sample passwords, introspection, and public data. For deployment, use TLS, production Keycloak mode with an external supported database, managed secrets, stronger user enrollment/MFA policies, network-restricted subgraphs, rate limits, and an explicit authorization model for nonpublic data. Logout does not instantly revoke already-issued JWT access tokens; they expire after five minutes.
+The localhost example intentionally uses Keycloak `start-dev`, HTTP, a development database, known sample passwords, introspection, and public data. For deployment, use TLS, production Keycloak mode with an external supported database, managed secrets, stronger user enrollment/MFA policies, network-restricted subgraphs, rate limits, and an explicit authorization model for nonpublic data. Logout does not instantly revoke already-issued JWT access tokens; they retain their original expiry, up to 12 hours in this demo. Use short-lived access tokens with refresh for production.
 
 References: [OAuth 2.0 Security Best Current Practice (RFC 9700)](https://www.rfc-editor.org/rfc/rfc9700.html), [Keycloak containers](https://www.keycloak.org/server/containers), [gqlgen federation](https://gqlgen.com/recipes/federation/), and [Cosmo router](https://github.com/wundergraph/cosmo).

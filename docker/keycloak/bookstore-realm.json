@@ -69,9 +69,9 @@
       "id": "00000000-0000-4000-8000-000000000002"
     }
   ],
-  "accessTokenLifespan": 300,
-  "ssoSessionIdleTimeout": 1800,
-  "ssoSessionMaxLifespan": 36000,
+  "accessTokenLifespan": 43200,
+  "ssoSessionIdleTimeout": 43200,
+  "ssoSessionMaxLifespan": 86400,
   "revokeRefreshToken": true,
   "refreshTokenMaxReuse": 0,
   "bruteForceProtected": true,
