@@ -1,0 +1,79 @@
+{
+  "realm": "bookstore",
+  "enabled": true,
+  "registrationAllowed": false,
+  "clients": [
+    {
+      "clientId": "bookstore",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": [
+        "http://localhost:8083/"
+      ],
+      "webOrigins": [
+        "http://localhost:8083"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "http://localhost:8083/"
+      },
+      "protocolMappers": [
+        {
+          "name": "bookstore-audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "config": {
+            "included.client.audience": "bookstore",
+            "access.token.claim": "true",
+            "id.token.claim": "false"
+          }
+        }
+      ],
+      "implicitFlowEnabled": false,
+      "serviceAccountsEnabled": false,
+      "fullScopeAllowed": false
+    }
+  ],
+  "users": [
+    {
+      "username": "ada",
+      "enabled": true,
+      "firstName": "Ada",
+      "lastName": "Lovelace",
+      "email": "ada@example.test",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "ada",
+          "temporary": false
+        }
+      ],
+      "id": "00000000-0000-4000-8000-000000000001"
+    },
+    {
+      "username": "grace",
+      "enabled": true,
+      "firstName": "Grace",
+      "lastName": "Hopper",
+      "email": "grace@example.test",
+      "emailVerified": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "grace",
+          "temporary": false
+        }
+      ],
+      "id": "00000000-0000-4000-8000-000000000002"
+    }
+  ],
+  "accessTokenLifespan": 300,
+  "ssoSessionIdleTimeout": 1800,
+  "ssoSessionMaxLifespan": 36000,
+  "revokeRefreshToken": true,
+  "refreshTokenMaxReuse": 0,
+  "bruteForceProtected": true,
+  "editUsernameAllowed": false
+}

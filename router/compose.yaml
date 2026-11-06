@@ -1,0 +1,17 @@
+version: 1
+subgraphs:
+  - name: accounts
+    routing_url: http://accounts:8080/graphql
+    schema:
+      file: ../internal/accounts/schema.graphqls
+  - name: catalog
+    routing_url: http://catalog:8080/graphql
+    schema:
+      file: ../internal/catalog/schema.graphqls
+  - name: reviews
+    routing_url: http://reviews:8080/graphql
+    subscription:
+      url: ws://reviews:8080/graphql
+      protocol: ws
+    schema:
+      file: ../internal/reviews/schema.graphqls

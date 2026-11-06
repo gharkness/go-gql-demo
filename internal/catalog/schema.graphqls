@@ -1,0 +1,19 @@
+extend schema @link(url: "https://specs.apollo.dev/federation/v2.3", import: ["@key"])
+enum Genre { TECHNOLOGY FICTION }
+type Book implements Node @key(fields: "id") {
+ id: ID!
+ title: String!
+ genre: Genre!
+ author: User!
+}
+type User @key(fields: "id", resolvable: false) { id: ID! }
+type Query {
+ node(id: ID!): Node
+ search(text: String!): [SearchResult!]!
+ book(id: ID!): Book
+ books(first: Int! = 10, offset: Int! = 0): [Book!]!
+}
+
+interface Node { id: ID! }
+type ReadingList implements Node { id: ID! name: String! books: [Book!]! }
+union SearchResult = Book | ReadingList

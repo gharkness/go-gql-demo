@@ -1,0 +1,22 @@
+schema: [internal/reviews/schema.graphqls]
+exec:
+  filename: internal/reviews/generated.go
+  package: reviews
+model:
+  filename: internal/reviews/models_gen.go
+  package: reviews
+resolver:
+  layout: follow-schema
+  dir: internal/reviews
+  package: reviews
+federation:
+  filename: internal/reviews/federation.go
+  package: reviews
+  version: 2
+models:
+  Time:
+    model: github.com/99designs/gqlgen/graphql.Time
+  Book:
+    fields:
+      reviews:
+        resolver: true

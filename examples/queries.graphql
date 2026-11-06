@@ -1,0 +1,57 @@
+# Run individual operations in http://localhost:8080.
+query Bookstore {
+  books(first: 3, offset: 0) {
+    id
+    title
+    genre
+    author { id name }
+    reviews(first: 5) {
+      id body rating createdAt
+      author { name }
+    }
+  }
+}
+
+# Variables: {"id":"1", "includeReviews":true}
+query BookDetails($id: ID!, $includeReviews: Boolean! = false) {
+  chosenBook: book(id: $id) {
+    ...BookSummary
+    reviews @include(if: $includeReviews) { body rating }
+  }
+}
+fragment BookSummary on Book { id title genre author { name } }
+
+query InterfaceAndUnion {
+  node(id: "1") { id ... on Book { title } }
+  search(text: "Computing") {
+    __typename
+    ... on Book { id title }
+    ... on ReadingList { name books { id title } }
+  }
+}
+
+# HTTP header: {"Authorization":"Bearer YOUR_ACCESS_TOKEN"}
+mutation AddReview {
+  createReview(input: {bookId: "1", body: "Useful examples!", rating: 5}) {
+    id body rating createdAt
+    author { name }
+    book { title }
+  }
+}
+
+# Public events; no Authorization header needed. Run in one playground tab,
+# then AddReview in another. The router joins author/book fields for each event.
+subscription NewReviews {
+  reviewCreated(bookId: "1") {
+    id body rating createdAt
+    author { name }
+    book { title }
+  }
+}
+
+# Direct subgraph only: http://localhost:8081/graphql
+query FederationEntity {
+  _entities(representations: [{__typename: "User", id: "1"}]) {
+    ... on User { id name }
+  }
+}

@@ -1,0 +1,12 @@
+version: "1"
+headers:
+  all:
+    request:
+      - op: propagate
+        named: Authorization
+telemetry:
+  tracing:
+    enabled: false
+  metrics:
+    prometheus:
+      enabled: false

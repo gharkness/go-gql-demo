@@ -1,0 +1,15 @@
+schema: [internal/catalog/schema.graphqls]
+exec:
+  filename: internal/catalog/generated.go
+  package: catalog
+model:
+  filename: internal/catalog/models_gen.go
+  package: catalog
+resolver:
+  layout: follow-schema
+  dir: internal/catalog
+  package: catalog
+federation:
+  filename: internal/catalog/federation.go
+  package: catalog
+  version: 2

@@ -1,0 +1,1 @@
+{"private":true,"scripts":{"compose":"wgc router compose -i compose.yaml -o execution.json"},"devDependencies":{"wgc":"0.133.6"}}

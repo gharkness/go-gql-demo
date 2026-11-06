@@ -1,0 +1,85 @@
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: local-root
+      MYSQL_DATABASE: bookstore
+      MYSQL_USER: demo
+      MYSQL_PASSWORD: demo
+    ports: ["127.0.0.1:3307:3306"]
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./docker/mysql:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysql -h 127.0.0.1 -udemo -pdemo bookstore -e 'SELECT 1'"]
+      interval: 3s
+      timeout: 3s
+      retries: 40
+  accounts: &subgraph
+    build: .
+    environment:
+      SUBGRAPH: accounts
+      MYSQL_DSN: demo:demo@tcp(mysql:3306)/bookstore?parseTime=true
+    ports: ["127.0.0.1:8081:8080"]
+    depends_on:
+      mysql: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/healthz"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+  catalog:
+    <<: *subgraph
+    environment:
+      SUBGRAPH: catalog
+      MYSQL_DSN: demo:demo@tcp(mysql:3306)/bookstore?parseTime=true
+    ports: ["127.0.0.1:8082:8080"]
+  reviews:
+    <<: *subgraph
+    environment:
+      SUBGRAPH: reviews
+      MYSQL_DSN: demo:demo@tcp(mysql:3306)/bookstore?parseTime=true
+      OIDC_ISSUER: http://localhost:8085/realms/bookstore
+      OIDC_JWKS_URL: http://keycloak:8080/realms/bookstore/protocol/openid-connect/certs
+    ports: ["127.0.0.1:8084:8080"]
+    depends_on:
+      mysql: {condition: service_healthy}
+      keycloak: {condition: service_healthy}
+
+  router:
+    image: ghcr.io/wundergraph/cosmo/router:0.366.1
+    ports: ["127.0.0.1:8080:8080"]
+    environment:
+      DEV_MODE: "true"
+      CONFIG_PATH: /config/config.yaml
+      LISTEN_ADDR: "0.0.0.0:8080"
+      EXECUTION_CONFIG_FILE_PATH: /config/execution.json
+      EXECUTION_CONFIG_FILE_WATCH: "true"
+    volumes:
+      - ./router:/config:ro
+    depends_on:
+      accounts: {condition: service_healthy}
+      catalog: {condition: service_healthy}
+      reviews: {condition: service_healthy}
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.8.1
+    command: ["start-dev", "--import-realm"]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_HOSTNAME: http://localhost:8085
+      KC_HEALTH_ENABLED: "true"
+    ports: ["127.0.0.1:8085:8080"]
+    volumes:
+      - ./docker/keycloak:/opt/keycloak/data/import:ro
+      - keycloak-data:/opt/keycloak/data
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/localhost/9000; printf \"GET /health/ready HTTP/1.0\\r\\n\\r\\n\" >&3; cat <&3 | grep -q UP'"]
+      interval: 5s
+      timeout: 5s
+      retries: 40
+
+volumes:
+  mysql-data:
+  keycloak-data:

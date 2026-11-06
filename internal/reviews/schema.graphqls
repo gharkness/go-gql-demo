@@ -1,0 +1,23 @@
+extend schema @link(url: "https://specs.apollo.dev/federation/v2.3", import: ["@key", "@external"])
+scalar Time
+type Review @key(fields: "id") {
+ id: ID!
+ body: String!
+ rating: Int!
+ createdAt: Time!
+ author: User!
+ book: Book!
+}
+type User @key(fields: "id", resolvable: false) { id: ID! }
+extend type Book @key(fields: "id") {
+ id: ID! @external
+ reviews(first: Int! = 10, offset: Int! = 0): [Review!]!
+}
+type Query { review(id: ID!): Review }
+input CreateReviewInput {
+ bookId: ID!
+ body: String!
+ rating: Int!
+}
+type Mutation { createReview(input: CreateReviewInput!): Review! }
+type Subscription { reviewCreated(bookId: ID!): Review! }

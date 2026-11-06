@@ -1,0 +1,18 @@
+schema: [internal/accounts/schema.graphqls]
+exec:
+  filename: internal/accounts/generated.go
+  package: accounts
+model:
+  filename: internal/accounts/models_gen.go
+  package: accounts
+resolver:
+  layout: follow-schema
+  dir: internal/accounts
+  package: accounts
+federation:
+  filename: internal/accounts/federation.go
+  package: accounts
+  version: 2
+models:
+  User:
+    model: github.com/gharkness/go-gql-demo/internal/store.User
